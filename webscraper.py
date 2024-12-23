@@ -5,22 +5,27 @@ import json
 import asyncio
 import time
 
+t = time.time() 
+
 def addorupdate(dic: dict):
     dep = dic["classtype"]
     code = dic["classcode"]
+    global t
     try:
         connection = sqlite3.connect("classdata.db")
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM classes WHERE classtype = ? AND classcode = ?", (dic["classtype"], dic["classcode"]))
         info = cursor.fetchone()
         if info is None:
-            cursor.execute("INSERT INTO classes (classtype, classcode, classtitle, classdescription, prerequisites, corequisites, typicallyoffered, credits) VALUES (?,?,?,?,?,?,?,?)", (str(dic["classtype"]), str(dic["classcode"]), str(dic["classtitle"]), str(dic["classdescription"]), str(dic["prerequisites"]), str(dic["corequisites"]), str(dic["typicallyoffered"]), str(dic["credits"])))
+            cursor.execute("INSERT INTO classes (classtype, classcode, classtitle, classdescription, prerequisites, corequisites, typicallyoffered, credits) VALUES (?,?,?,?,?,?,?,?)", (str(dic["classtype"]), str(dic["classcode"]), str(dic["classtitle"]), str(dic["classdescription"]), str(dic["prerequisites"]), str(dic["corequisites"]), str(dic["typicallyoffered"]), str(dic["credits"]), str(dic["link"])))
+            print(f"Successful update for {dic["classtype"]} {dic["classcode"]} | Process took {(time.time() - t):.2f} seconds to complete.")
         else:
-            cursor.execute("UPDATE classes SET classtitle = ?, classdescription = ?, prerequisites = ?, corequisites = ?, typicallyoffered = ?, credits = ? WHERE classtype = ? AND classcode = ?", ( str(dic["classtitle"]), str(dic["classdescription"]), str(dic["prerequisites"]), str(dic["corequisites"]), str(dic["typicallyoffered"]), str(dic["credits"]), str(dic["classtype"]), str(dic["classcode"])))
-        print(f"Successful query for {dic["classtype"]} {dic["classcode"]}")
+            cursor.execute("UPDATE classes SET classtitle = ?, classdescription = ?, prerequisites = ?, corequisites = ?, typicallyoffered = ?, credits = ?, link = ? WHERE classtype = ? AND classcode = ?", ( str(dic["classtitle"]), str(dic["classdescription"]), str(dic["prerequisites"]), str(dic["corequisites"]), str(dic["typicallyoffered"]), str(dic["credits"]), str(dic["link"]), str(dic["classtype"]), str(dic["classcode"])))
+            print(f"Successful update for {dic["classtype"]} {dic["classcode"]} | Process took {(time.time() - t):.2f} seconds to complete.")
         connection.commit()
     except:
-        print(f"Insetion/Updating database failed for {dic["classtype"]} {dic["classcode"]}")
+        print(f"Insetion/Updating database failed for {dic["classtype"]} {dic["classcode"]} | Process took {(time.time() - t):.2f} seconds to complete.")
+    t = time.time()
     cursor.close()
 
 def removesecsigns(s: str) -> str:
@@ -41,6 +46,7 @@ def removesecsigns(s: str) -> str:
 def parse(link: str, code: str):
     lootlist = []
     dbdict = {}
+    dbdict["link"] = link
     dbdict["classtype"] = code.split(" ")[0]
     dbdict["classcode"] = code.split(" ")[1]
     r = requests.get(link)
@@ -82,7 +88,7 @@ def parse(link: str, code: str):
     addorupdate(dbdict)
 
 
-linkstem = "https://stevens.smartcatalogiq.com/"
+linkstem = "https://stevens.smartcatalogiq.com"
 
 f = open('academic-catalogue.json')
 
@@ -104,4 +110,5 @@ for sec in coursedict["Children"]:
 #cursor.execute("INSERT INTO classes (classtype, classcode, classtitle, classdescription, prerequisites, corequisites, typicallyoffered, credits) VALUES (?,?,?,?,?,?,?,?)", ("CS", "284", "CS 284   Data Structures", "", "CS 115", "CS 135", "Fall Semester Spring Semester", 3))
 #connection.commit()
 #connection.close()
+print(f"Webscrape of the Stevens Academic Catalogue took {(time.time()):.2f}")
 f.close()

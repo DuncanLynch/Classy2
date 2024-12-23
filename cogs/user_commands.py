@@ -50,6 +50,11 @@ class classes(commands.Cog):
         classdata = cursor.fetchall()
         cursor.close()
         if not classdata:
+            connection = sqlite3.connect("classdata.db")
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO analytics (username,classtype,classcode,hitormiss,guild) VALUES (?,?,?,?,?)", (str(ctx.user.name), school.upper(), code, "miss", ctx.guild.name))
+            connection.commit()
+            connection.close()
             embed = discord.Embed(title=(school.upper() + " " + code),description=f"No class by the name of {school.upper()} {code} has been found in the database.", color=discord.Color.brand_red())
             embed.set_footer(text="Requested by: " + ctx.author.name, icon_url=ctx.author.avatar)
             embed.set_author(name = "Classy2 by Duncan Lynch", icon_url=self.bot.user.avatar)
@@ -58,7 +63,12 @@ class classes(commands.Cog):
             #no class found method
         for i in classdata:
             #create and send embed object per class
-            embed = discord.Embed(title = i[2], description = i[3], color = discord.Color.brand_green())
+            connection = sqlite3.connect("classdata.db")
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO analytics (username,classtype,classcode,hitormiss,guild) VALUES (?,?,?,?,?)", (str(ctx.user.name), school.upper(), code, "hit", ctx.guild.name))
+            connection.commit()
+            connection.close()
+            embed = discord.Embed(title = i[2], description = i[3], color = discord.Color.brand_green(), url=i[8])
             embed.add_field(name = "Credits", value=i[7])
             if i[4]:
                 embed.add_field(name="Pre-requisites", value =i[4], inline = True)

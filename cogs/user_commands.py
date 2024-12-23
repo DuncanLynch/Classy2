@@ -46,7 +46,7 @@ class classes(commands.Cog):
         await ctx.defer()
         connection = sqlite3.connect("classdata.db")
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM classes WHERE classtype = ? AND classcode = ?", (str(school), str(code)))        
+        cursor.execute("SELECT * FROM classes WHERE classtype = ? AND classcode = ?", (str(school.upper()), str(code)))        
         classdata = cursor.fetchall()
         cursor.close()
         if not classdata:

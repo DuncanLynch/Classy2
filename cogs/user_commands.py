@@ -50,7 +50,10 @@ class classes(commands.Cog):
         classdata = cursor.fetchall()
         cursor.close()
         if not classdata:
-            await ctx.followup.send(f"No class by the name of {school} {code} was found in the database.")
+            embed = discord.Embed(title=(school.upper() + " " + code),description=f"No class by the name of {school.upper()} {code} has been found in the database.", color=discord.Color.brand_red())
+            embed.set_footer(text="Requested by: " + ctx.author.name, icon_url=ctx.author.avatar)
+            embed.set_author(name = "Classy2 by Duncan Lynch", icon_url=self.bot.user.avatar)
+            await ctx.followup.send(embed=embed)
             return
             #no class found method
         for i in classdata:
@@ -64,7 +67,7 @@ class classes(commands.Cog):
             if i[6]:
                 embed.add_field(name="Typically offered periods", value =i[6])
             embed.set_footer(text="Requested by: " + ctx.author.name, icon_url=ctx.author.avatar)
-            embed.set_author(name = "Classy2", icon_url=self.bot.user.avatar)
+            embed.set_author(name = "Classy2 by Duncan Lynch", icon_url=self.bot.user.avatar)
             await ctx.followup.send(embed=embed)
         return
     

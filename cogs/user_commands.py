@@ -43,9 +43,28 @@ class classes(commands.Cog):
         print("Class commands Cog is initialized.")
 
     classes = discord.SlashCommandGroup("classy", "A command regarding classes at Steven's Institute of Technology")
+    admin = classes.create_subgroup("Admin","Shhhhhhhhh :flushed:")
 
-
-
+    @admin.command()
+    async def updateDB(self, ctx, school, code, title, description, pre, co, typicallyoffered, credits, link):
+        await ctx.defer()
+        if ctx.author.name.lower() != "hypadeficit":
+            await ctx.followup.send("You are not authorized to run this command...")
+            return
+        connection = sqlite3.connect("classdata.db")
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM classes WHERE classtype = ? AND classcode = ?", (str(school.upper()), str(code))) 
+        data = cursor.fetchall()
+        try:
+            if not data:
+                cursor.execute("INSERT INTO classes (classtype, classcode, classtitle, classdescription, prerequisites, corequisites, typicallyoffered, credits, link) VALUES (?,?,?,?,?,?,?,?,?)", str(school.upper()), (str(code), str(title), str(description), str(pre), str(co), str(typicallyoffered), str(credits), str(link)))
+            else:
+                cursor.execute("UPDATE classes SET classtitle = ?, classdescription = ?, prerequisites = ?, corequisites = ?, typicallyoffered = ?, credits = ?, link = ? WHERE classtype = ? AND classcode = ?", (str(title), str(description), str(pre), str(co), str(typicallyoffered), str(credits), str(link), str(school.upper()), str(code))) 
+        except:
+            await ctx.followup.send("shit failed")
+            return
+        await ctx.followup.send("Shit worked")
+        return
     @classes.command(name = "query")
     async def classyquery(self, ctx, school: discord.Option(str, autocomplete=discord.utils.basic_autocomplete(coursecodes)), code):
         await ctx.defer()
@@ -279,5 +298,6 @@ class classes(commands.Cog):
         else:
             embed = discord.Embed(title = "Error!", description=f"Error fetching {ctx.author.name}'s wishlist! No items found.", color = discord.Color.brand_red())
             await ctx.followup.send(embed=embed)
+
 def setup(bot):
     bot.add_cog(classes(bot))

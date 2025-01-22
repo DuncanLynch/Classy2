@@ -46,7 +46,7 @@ class classes(commands.Cog):
     admin = classes.create_subgroup("admin","Shhhhhhhhh :flushed:")
 
     @admin.command()
-    async def updateDB(self, ctx, school, code, title, description, pre, co, typicallyoffered, credits, link):
+    async def updatedb(self, ctx, school, code, title, description, pre, co, typicallyoffered, credits, link):
         await ctx.defer()
         if ctx.author.name.lower() != "hypadeficit":
             await ctx.followup.send("You are not authorized to run this command...")

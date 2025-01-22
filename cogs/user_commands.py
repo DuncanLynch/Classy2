@@ -43,7 +43,7 @@ class classes(commands.Cog):
         print("Class commands Cog is initialized.")
 
     classes = discord.SlashCommandGroup("classy", "A command regarding classes at Steven's Institute of Technology")
-    admin = classes.create_subgroup("Admin","Shhhhhhhhh :flushed:")
+    admin = classes.create_subgroup("admin","Shhhhhhhhh :flushed:")
 
     @admin.command()
     async def updateDB(self, ctx, school, code, title, description, pre, co, typicallyoffered, credits, link):
